@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+
+    <meta
+      name="description"
+      content="PAM Beauty - Premium wigs, hair products, and beauty accessories."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
+
+    <title>PAM Beauty</title>
+
+    <!-- Splash Styles -->
+    <style>
+      #pam-splash {
+        position: fixed;
+        inset: 0;
+        background: #f7f2ee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.6s ease;
+      }
+
+      #pam-splash img {
+        width: 120px;
+        height: auto;
+        opacity: 0;
+        animation: pamFade 1.2s ease forwards;
+      }
+
+      @keyframes pamFade {
+        to {
+          opacity: 1;
+        }
+      }
+
+      .pam-loaded #pam-splash {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <!-- Splash -->
+    <div id="pam-splash">
+      <img src="%PUBLIC_URL%/logo192.png" alt="PAM Beauty" />
+    </div>
+
+    <div id="root"></div>
+
+    <!-- Remove splash when app loads -->
+    <script>
+      window.addEventListener("load", function () {
+        document.body.classList.add("pam-loaded");
+        setTimeout(function () {
+          var splash = document.getElementById("pam-splash");
+          if (splash) splash.remove();
+        }, 700);
+      });
+    </script>
+
+    <!-- PostHog analytics (optional) -->
+    <script>
+      !(function (t, e) {
+        var o, n, p, r;
+        e.__SV ||
+          ((window.posthog = e),
+          (e._i = []),
+          (e.init = function (i, s, a) {
+            function g(t, e) {
+              var o = e.split(".");
+              2 == o.length && ((t = t[o[0]]), (e = o[1])),
+                (t[e] = function () {
+                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+                });
+            }
+            ((p = t.createElement("script")).type = "text/javascript"),
+              (p.crossOrigin = "anonymous"),
+              (p.async = !0),
+              (p.src =
+                s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
+                "/static/array.js"),
+              (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(
+                p,
+                r
+              );
+            var u = e;
+            for (
+              void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
+                u.people = u.people || [],
+                u.toString = function (t) {
+                  var e = "posthog";
+                  return (
+                    "posthog" !== a && (e += "." + a),
+                    t || (e += " (stub)"),
+                    e
+                  );
+                },
+                u.people.toString = function () {
+                  return u.toString(1) + ".people (stub)";
+                },
+                o = "init capture identify set_config".split(" "),
+                n = 0;
+              n < o.length;
+              n++
+            )
+              g(u, o[n]);
+            e._i.push([i, s, a]);
+          }),
+          (e.__SV = 1));
+      })(document, window.posthog || []);
+
+      posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
+        api_host: "https://us.i.posthog.com",
+        person_profiles: "identified_only",
+        session_recording: {
+          recordCrossOriginIframes: true,
+          capturePerformance: false,
+        },
+      });
+    </script>
+  </body>
+</html>

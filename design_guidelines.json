@@ -1,0 +1,146 @@
+{
+  "identity": {
+    "name": "Luxe Looks",
+    "description": "A 1920s Parisian jewelry boutique reimagined for the digital age. Opulent, precise, and airy.",
+    "key_principles": [
+      "Light Art Deco: Ivory backgrounds, not black.",
+      "Geometric Precision: Stepped corners, L-brackets, double-line borders.",
+      "Editorial Typography: Big serif headings, clean geometric body.",
+      "Mechanical Motion: Slow, ease-out transitions (300ms-600ms).",
+      "Asymmetry: Broken grids to avoid 'template' feel."
+    ]
+  },
+  "typography": {
+    "font_family": {
+      "heading": "Marcellus, serif",
+      "body": "Josefin Sans, sans-serif",
+      "mono": "Space Mono, monospace"
+    },
+    "scale": {
+      "display": "text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[0.9]",
+      "h1": "text-4xl md:text-5xl tracking-tight",
+      "h2": "text-3xl md:text-4xl tracking-tight",
+      "h3": "text-2xl md:text-3xl tracking-normal",
+      "body_lg": "text-lg md:text-xl leading-relaxed",
+      "body": "text-base leading-relaxed",
+      "caption": "text-xs tracking-[0.2em] uppercase"
+    },
+    "installation": "Import fonts via Google Fonts in index.css: @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Josefin+Sans:wght@300;400;500;600&display=swap');"
+  },
+  "colors": {
+    "palette": {
+      "background": "#F7F3EA",
+      "foreground": "#1A1A1A",
+      "card": "#FBF7F0",
+      "card_foreground": "#1A1A1A",
+      "popover": "#FBF7F0",
+      "popover_foreground": "#1A1A1A",
+      "primary": "#1A1A1A",
+      "primary_foreground": "#F7F3EA",
+      "secondary": "#F2EBDD",
+      "secondary_foreground": "#1A1A1A",
+      "muted": "#F2EBDD",
+      "muted_foreground": "#5B5B5B",
+      "accent": "#D4AF37",
+      "accent_foreground": "#FFFFFF",
+      "destructive": "#991B1B",
+      "destructive_foreground": "#F7F3EA",
+      "border": "#D4AF37",
+      "input": "#D4AF37",
+      "ring": "#D4AF37"
+    },
+    "special": {
+      "gold_gilded": "#D4AF37",
+      "midnight_blue": "#1E3D59",
+      "soft_graphite": "#5B5B5B",
+      "ivory_mist": "#F7F3EA",
+      "champagne_paper": "#F2EBDD"
+    }
+  },
+  "visual_enhancers": {
+    "borders": {
+      "default": "border border-[#D4AF37]/30",
+      "active": "border border-[#D4AF37]",
+      "art_deco": "border-2 border-double border-[#D4AF37]"
+    },
+    "shadows": {
+      "soft": "shadow-[0_4px_20px_-2px_rgba(212,175,55,0.1)]",
+      "hard": "shadow-[4px_4px_0px_0px_rgba(212,175,55,0.2)]"
+    },
+    "radius": {
+      "default": "rounded-none",
+      "cut_corner": "clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)"
+    },
+    "textures": {
+      "noise": "bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mixed-blend-overlay",
+      "sunburst": "bg-[conic-gradient(from_90deg_at_50%_50%,#F7F3EA_0deg,#F2EBDD_20deg,#F7F3EA_40deg,#F2EBDD_60deg,#F7F3EA_80deg)]"
+    }
+  },
+  "layout": {
+    "grid_strategy": "Bento Grid with Art Deco Asymmetry. Use 'col-span-12 md:col-span-8' vs 'col-span-4' splits.",
+    "spacing": {
+      "container": "px-6 md:px-12 lg:px-24 max-w-[1600px] mx-auto",
+      "section": "py-24 md:py-32",
+      "element": "gap-6 md:gap-12"
+    }
+  },
+  "components": {
+    "Button": {
+      "style": "uppercase tracking-widest text-xs font-bold border border-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition-all duration-300 rounded-none px-8 py-3",
+      "variants": {
+        "primary": "bg-[#1A1A1A] text-[#D4AF37] border-[#1A1A1A] hover:bg-transparent hover:text-[#1A1A1A]",
+        "outline": "bg-transparent text-[#1A1A1A] border-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
+      }
+    },
+    "Card": {
+      "style": "bg-[#FBF7F0] border border-[#D4AF37]/20 p-8 rounded-none relative overflow-hidden group hover:border-[#D4AF37] transition-colors duration-500"
+    },
+    "Input": {
+      "style": "bg-transparent border-b-2 border-[#D4AF37]/30 focus:border-[#D4AF37] rounded-none px-0 py-4 text-lg focus:ring-0 placeholder:text-[#5B5B5B]/50 font-serif"
+    }
+  },
+  "media": {
+    "image_urls": {
+      "hero_background": "https://images.unsplash.com/photo-1768528426138-eeeaa7f74414?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwxfHxhcnQlMjBkZWNvJTIwZ29sZCUyMHRleHR1cmUlMjBwYXR0ZXJufGVufDB8fHx8MTc3MDczNDMxNXww&ixlib=rb-4.1.0&q=85",
+      "product_necklace": "https://images.unsplash.com/photo-1736436789706-005f2218a96d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBnb2xkJTIwbmVja2xhY2UlMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcwNzM0MzE0fDA&ixlib=rb-4.1.0&q=85",
+      "model_portrait": "https://images.unsplash.com/photo-1749318104909-ee768bac4d7e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwyfHxmYXNoaW9uJTIwbW9kZWwlMjB3ZWFyaW5nJTIwZ29sZCUyMGpld2VscnklMjBwb3J0cmFpdCUyMGVsZWdhbnR8ZW58MHx8fHwxNzcwNzM0MzE1fDA&ixlib=rb-4.1.0&q=85",
+      "texture_gold": "https://images.unsplash.com/photo-1532328076801-a862c9d5a74a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHxmYXNoaW9uJTIwbW9kZWwlMjB3ZWFyaW5nJTIwZ29sZCUyMGpld2VscnklMjBwb3J0cmFpdCUyMGVsZWdhbnR8ZW58MHx8fHwxNzcwNzM0MzE1fDA&ixlib=rb-4.1.0&q=85"
+    }
+  },
+  "admin_panel_guidelines": {
+    "layout": "Sidebar navigation with Midnight Blue (#1E3D59) background and Gold (#D4AF37) active states.",
+    "dashboard": "Cards must not use shadows. Use 1px borders. High density grids.",
+    "tables": "Use 'Marcellus' for headers. Striped rows with #F2EBDD/20."
+  },
+  "instructions_to_main_agent": [
+    "1. UPDATE tailwind.config.js with the colors defined above immediately.",
+    "2. ADD fonts to index.css immediately.",
+    "3. OVERRIDE shadcn/ui components: Remove all 'rounded-md' classes. This is an Art Deco brand, squares are king.",
+    "4. IMPLEMENT the 'L-bracket' decorative element on product cards using pseudo-elements (::before/::after).",
+    "5. ENSURE the Admin Panel shares the same 'font-family' and 'border-color' system as the storefront, but can be denser.",
+    "6. USE 'framer-motion' for all page transitions. No jump cuts.",
+    "7. DO NOT use black backgrounds. Use #F7F3EA (Ivory Mist).",
+    "8. CREATE a 'Glass' effect using backdrop-blur-md + bg-[#F7F3EA]/80 for sticky headers."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use 'sonner' for toasts. Sonner component are located in /app/src/components/ui/sonner.tsx"
+  ]
+}

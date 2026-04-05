@@ -1,0 +1,191 @@
+/* PAM Beauty Global Styles */
+
+/* Editorial divider */
+.editorial-divider {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(17, 17, 17, 0.18), transparent);
+  margin: 3rem 0;
+}
+
+.editorial-divider::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: rgba(17, 17, 17, 0.12);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* Product card styling */
+.product-card {
+  position: relative;
+  background: #ffffff;
+  transition: all 0.3s ease-out;
+}
+
+.product-card::before,
+.product-card::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  transition: all 0.3s ease-out;
+  pointer-events: none;
+}
+
+.product-card::before {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.product-card::after {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+.product-card:hover::before,
+.product-card:hover::after {
+  width: 28px;
+  height: 28px;
+  border-color: rgba(17, 17, 17, 0.22);
+}
+
+/* Soft framed corners */
+.soft-frame {
+  position: relative;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+/* Neutral shimmer */
+@keyframes softShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.soft-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: softShimmer 3s ease-in-out infinite;
+}
+
+/* Scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f7f2ee;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(17, 17, 17, 0.25);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(17, 17, 17, 0.4);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid rgba(17, 17, 17, 0.45);
+  outline-offset: 2px;
+}
+
+/* Button hover sheen */
+.premium-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease-out;
+}
+
+.premium-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: -120%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+  transition: left 0.55s ease-out;
+}
+
+.premium-button:hover::before {
+  left: 120%;
+}
+
+/* Glass effect */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+/* Minimal icon container */
+.icon-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+/* Soft grid texture */
+.soft-grid-bg {
+  background-image:
+    linear-gradient(rgba(17, 17, 17, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 17, 17, 0.03) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Nude gradient */
+.nude-gradient {
+  background: linear-gradient(
+    135deg,
+    #fffdfb 0%,
+    #f8f6f4 45%,
+    #f3ede8 100%
+  );
+}
+
+/* Hero surface */
+.hero-surface {
+  background: linear-gradient(
+    180deg,
+    rgba(248, 246, 244, 0.75) 0%,
+    rgba(255, 255, 255, 0.88) 55%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}

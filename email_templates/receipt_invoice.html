@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt - Luxe Looks</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Georgia', serif;
+            background-color: #F7F3EA;
+            color: #1A1A1A;
+        }
+        .receipt {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #FBF7F0;
+            border: 2px solid #D4AF37;
+            padding: 40px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #D4AF37;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            width: 50px;
+            height: 50px;
+            background-color: #D4AF37;
+            margin: 0 auto 20px;
+            transform: rotate(45deg);
+        }
+        .logo-inner {
+            width: 20px;
+            height: 20px;
+            background-color: #1E3D59;
+            margin: 15px auto;
+            transform: rotate(-45deg);
+        }
+        .brand-name {
+            font-size: 32px;
+            color: #1A1A1A;
+            letter-spacing: 3px;
+            margin: 10px 0;
+        }
+        .tagline {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #5B5B5B;
+        }
+        .receipt-title {
+            font-size: 24px;
+            text-align: center;
+            color: #D4AF37;
+            letter-spacing: 2px;
+            margin: 30px 0;
+            text-transform: uppercase;
+        }
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #F2EBDD;
+        }
+        .info-column {
+            flex: 1;
+        }
+        .info-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #5B5B5B;
+            margin-bottom: 10px;
+        }
+        .info-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        .items-table thead {
+            background-color: #1E3D59;
+            color: #D4AF37;
+        }
+        .items-table th {
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #F2EBDD;
+        }
+        .item-name {
+            font-weight: bold;
+        }
+        .item-variant {
+            font-size: 12px;
+            color: #5B5B5B;
+        }
+        .totals-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #F2EBDD;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .total-row.final {
+            border-top: 2px solid #D4AF37;
+            padding-top: 15px;
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .total-label {
+            color: #5B5B5B;
+        }
+        .total-value {
+            color: #1A1A1A;
+            font-weight: bold;
+        }
+        .total-row.final .total-value {
+            color: #D4AF37;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #D4AF37;
+            font-size: 12px;
+            color: #5B5B5B;
+        }
+        .footer-contact {
+            margin: 20px 0;
+        }
+        .print-button {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn-print {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #D4AF37;
+            color: #FFFFFF;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid #D4AF37;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="print-button no-print">
+        <button onclick="window.print()" class="btn-print">Print Receipt</button>
+    </div>
+
+    <div class="receipt">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-inner"></div>
+            </div>
+            <h1 class="brand-name">LUXE LOOKS</h1>
+            <p class="tagline">Art Deco Jewelry</p>
+            <p style="margin: 10px 0; font-size: 13px;">
+                Westlands, Nairobi, Kenya<br>
+                +254 700 123 456 | info@luxelooks.ke
+            </p>
+        </div>
+
+        <div class="receipt-title">Receipt</div>
+
+        <!-- Order Info -->
+        <div class="info-section">
+            <div class="info-column">
+                <div class="info-title">Order Details</div>
+                <div class="info-content">
+                    <strong>Order Number:</strong> {{ORDER_NUMBER}}<br>
+                    <strong>Date:</strong> {{ORDER_DATE}}<br>
+                    <strong>Payment Method:</strong> M-Pesa<br>
+                    <strong>Transaction ID:</strong> {{TRANSACTION_ID}}
+                </div>
+            </div>
+            <div class="info-column">
+                <div class="info-title">Bill To</div>
+                <div class="info-content">
+                    {{CUSTOMER_NAME}}<br>
+                    {{CUSTOMER_EMAIL}}<br>
+                    {{CUSTOMER_PHONE}}<br>
+                    {{DELIVERY_ADDRESS}}<br>
+                    {{DELIVERY_CITY}}, {{DELIVERY_COUNTY}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Variant</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Unit Price</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ORDER_ITEMS_ROWS}}
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="totals-section">
+            <div class="total-row">
+                <span class="total-label">Subtotal:</span>
+                <span class="total-value">KES {{SUBTOTAL}}</span>
+            </div>
+            {{GIFT_WRAP_ROW}}
+            <div class="total-row">
+                <span class="total-label">Shipping ({{SHIPPING_METHOD}}):</span>
+                <span class="total-value">KES {{SHIPPING_COST}}</span>
+            </div>
+            <div class="total-row final">
+                <span class="total-label">Total Paid:</span>
+                <span class="total-value">KES {{TOTAL}}</span>
+            </div>
+        </div>
+
+        <!-- Payment Confirmation -->
+        <div style="background-color: #E8F5E9; border-left: 4px solid #4CAF50; padding: 15px; margin: 30px 0;">
+            <p style="margin: 0; font-size: 14px; color: #1B5E20;">
+                <strong>✓ Payment Confirmed</strong><br>
+                Your payment has been successfully processed via M-Pesa.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-contact">
+                <strong>THANK YOU FOR YOUR PURCHASE</strong><br>
+                For inquiries, contact us at support@luxelooks.ke or +254 700 123 456
+            </div>
+            <p style="margin: 10px 0;">
+                www.luxelooks.ke | @luxelookskenya
+            </p>
+            <p style="margin: 10px 0; font-size: 11px;">
+                &copy; 2026 Luxe Looks. All rights reserved.
+            </p>
+            <p style="margin: 20px 0; font-size: 11px; font-style: italic;">
+                "Elegance is not about being noticed, it's about being remembered"
+            </p>
+        </div>
+    </div>
+</body>
+</html>
