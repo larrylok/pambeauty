@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
-import { Heart, ShoppingCart, Eye, SlidersHorizontal } from "lucide-react";
+import { Heart, ShoppingCart, Eye, SlidersHorizontal, X } from "lucide-react";
 import { toast } from "sonner";
 
 import api from "@/api";
@@ -71,7 +71,6 @@ export default function Home() {
   const [showFilters, setShowFilters] = useState(false);
   const [wishlist, setWishlist] = useState([]);
   const [navData, setNavData] = useState({ categories: [], collections: [] });
-  const [heroOffset, setHeroOffset] = useState(0);
 
   const hero = settings?.hero || {};
 
@@ -108,56 +107,30 @@ export default function Home() {
 
   useEffect(() => {
     const sp = new URLSearchParams(location.search);
+    const openFilters = sp.get("openFilters");
+    if (openFilters) setShowFilters(true);
 
-    const nextFilters = {
+    setFilters({
       category: sp.get("category") || "",
       collection: sp.get("collection") || "",
       search: sp.get("search") || "",
       sort: sp.get("sort") || "",
-    };
-
-    setFilters(nextFilters);
-    setPage(1);
+    });
   }, [location.search]);
 
   useEffect(() => {
     loadProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, filters]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!heroSectionRef.current) return;
-
-      const rect = heroSectionRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || 0;
-
-      const progress = Math.min(
-        Math.max((viewportHeight - rect.top) / (viewportHeight + rect.height), 0),
-        1
-      );
-
-      const translateY = progress * 36;
-      setHeroOffset(translateY);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  const scrollToProducts = () => {
-    requestAnimationFrame(() => {
-      productsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  };
+  }, [filters, page]);
 
   const loadWishlist = async () => {
-    const wl = (await storage.get("wishlist")) || [];
-    setWishlist(Array.isArray(wl) ? wl : []);
+    try {
+      const data = (await storage.get("wishlist")) || [];
+      const safeData = Array.isArray(data) ? data : [];
+      setWishlist(safeData);
+    } catch {
+      setWishlist([]);
+    }
   };
 
   const loadNavigation = async () => {
@@ -167,34 +140,31 @@ export default function Home() {
         categories: Array.isArray(res.data?.categories) ? res.data.categories : [],
         collections: Array.isArray(res.data?.collections) ? res.data.collections : [],
       });
-    } catch (error) {
-      console.error("Error loading navigation:", error);
+    } catch (err) {
+      console.error("Failed to load navigation:", err);
       setNavData({ categories: [], collections: [] });
     }
   };
 
   const loadSettings = async () => {
     try {
-      const res = await api.get("/settings");
-      setSettings(res.data || {});
-    } catch (error) {
-      console.error("Failed to load settings:", error);
+      const res = await api.get("/admin/settings");
+      setSettings(res.data);
+    } catch (err) {
+      console.error("Failed to load settings:", err);
     }
   };
 
   const loadProducts = async () => {
     setLoading(true);
+
     try {
-      const params = {
-        page,
-        limit: 20,
-        status: "active",
-      };
+      const params = { page, limit: 12 };
 
       if (filters.category) params.category = filters.category;
+      if (filters.collection) params.collection = filters.collection;
       if (filters.search) params.search = filters.search;
       if (filters.sort) params.sort = filters.sort;
-      if (filters.collection) params.collection = filters.collection;
 
       const response = await api.get("/products", { params });
       const data = response?.data;
@@ -324,281 +294,393 @@ export default function Home() {
   const desktopHeroPosition = hero.desktopImagePosition || "center top";
   const mobileHeroPosition = hero.mobileImagePosition || "center top";
 
+  // Scroll to products section
+  const scrollToProducts = () => {
+    setTimeout(() => {
+      if (productsRef.current) {
+        productsRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
   return (
-    <div className="min-h-screen bg-white text-black">
-      <div className="w-full border-b border-black/10 bg-[#f8f6f4]">
+    <div className="min-h-screen bg-white text-[#111111]">
+      {/* Announcement Bar - SOFT ROSE/MAUVE COLOR */}
+      <div className="w-full bg-[#D4B5A0] border-b border-[#C9A876]/20">
         <div className="container mx-auto px-6 md:px-12 lg:px-24 max-w-[1600px] py-3 text-center">
-          <p className="text-[10px] md:text-xs uppercase tracking-[0.28em] text-black/60">
+          <p className="text-[10px] md:text-xs uppercase tracking-[0.28em] text-white/95 font-medium drop-shadow-sm">
             {heroContent.announcement}
           </p>
         </div>
       </div>
 
+      {/* Hero Section */}
       <section
         ref={heroSectionRef}
-        className="relative isolate overflow-hidden bg-white min-h-[88vh] md:min-h-[96vh]"
+        className="relative isolate overflow-hidden bg-white min-h-[88vh] md:min-h-[96vh] flex items-center justify-center"
       >
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#f8f6f4]/60 via-white/40 to-white"></div>
-        </div>
-
+        {/* Background Image - Static, no parallax */}
         <div
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-0 opacity-100"
           style={{
-            transform: `translateY(${heroOffset}px)`,
-            transition: "transform 120ms linear",
+            backgroundImage: `url(${
+              window.innerWidth >= 768 ? desktopHeroImage : mobileHeroImage
+            })`,
+            backgroundPosition: window.innerWidth >= 768 ? desktopHeroPosition : mobileHeroPosition,
+            backgroundSize: "cover",
+            backgroundAttachment: "fixed",
           }}
         >
-          <div className="absolute inset-y-0 right-0 w-full lg:w-[58%]">
-            <div className="relative h-full w-full overflow-hidden lg:rounded-bl-[42px] bg-[#f8f6f4]">
-              <div className="absolute inset-0 bg-gradient-to-r from-white via-white/40 to-transparent lg:hidden z-10"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-white via-white/12 to-transparent hidden lg:block z-10"></div>
-
-              <img
-                src={desktopHeroImage}
-                alt="PAM Beauty editorial hero"
-                className="hidden md:block absolute inset-0 h-full w-full object-cover"
-                style={{ objectPosition: desktopHeroPosition }}
-              />
-
-              <img
-                src={mobileHeroImage}
-                alt="PAM Beauty editorial hero mobile"
-                className="block md:hidden absolute inset-0 h-full w-full object-cover"
-                style={{ objectPosition: mobileHeroPosition }}
-              />
-            </div>
-          </div>
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/40"></div>
         </div>
 
-        <div className="relative z-20 container mx-auto px-6 md:px-12 lg:px-24 max-w-[1600px] pt-10 md:pt-12 lg:pt-16 pb-14 md:pb-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-start lg:items-center min-h-[78vh] md:min-h-[82vh]">
-            <div className="lg:col-span-6 xl:col-span-5">
-              <div className="max-w-2xl bg-white/72 backdrop-blur-[2px] lg:bg-transparent lg:backdrop-blur-0 rounded-[28px] lg:rounded-none p-6 md:p-8 lg:p-0 border border-black/5 lg:border-0 shadow-[0_12px_40px_rgba(0,0,0,0.04)] lg:shadow-none">
-                <p className="text-[11px] md:text-xs uppercase tracking-[0.35em] text-black/60 mb-5">
-                  {heroContent.eyebrow}
-                </p>
+        {/* Hero Content */}
+        <div className="relative z-10 px-6 py-24 text-center max-w-4xl mx-auto">
+          <p className="text-[11px] tracking-[0.35em] uppercase text-white/95 mb-6 font-medium drop-shadow-lg">
+            {heroContent.eyebrow}
+          </p>
 
-                <h1 className="font-serif text-[2.6rem] leading-[0.94] md:text-[4.4rem] lg:text-[5.6rem] xl:text-[6.4rem] tracking-[-0.04em] text-black mb-5">
-                  {heroContent.titleLine1}
-                  <br />
-                  {heroContent.titleLine2}
-                </h1>
+          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-white leading-[1.1] mb-4 drop-shadow-lg font-bold">
+            {heroContent.titleLine1}
+          </h1>
 
-                <p className="text-sm md:text-base lg:text-lg leading-7 text-black/68 max-w-xl mb-8">
-                  {heroContent.description}
-                </p>
+          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white/95 leading-[1.1] mb-8 drop-shadow-lg">
+            {heroContent.titleLine2}
+          </h2>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <button
-                    onClick={() => {
-                      setShowFilters(false);
-                      setFilters({ category: "", collection: "", search: "", sort: "" });
-                      setPage(1);
-                      setSearchParams({});
-                      scrollToProducts();
-                    }}
-                    className="px-8 py-4 bg-black text-white hover:bg-black transition-all duration-300 text-sm tracking-[0.22em] uppercase font-semibold"
-                    type="button"
-                  >
-                    {heroContent.primaryCta}
-                  </button>
+          <p className="text-base md:text-lg text-white/90 mb-12 leading-relaxed drop-shadow-md max-w-2xl mx-auto">
+            {heroContent.description}
+          </p>
 
-                  <button
-                    onClick={() => {
-                      handleFilterChange("category", "wigs");
-                      scrollToProducts();
-                    }}
-                    className="px-8 py-4 border border-black/80 text-black hover:border-black hover:text-black transition-all duration-300 text-sm tracking-[0.22em] uppercase font-semibold bg-white/85 lg:bg-transparent"
-                    type="button"
-                  >
-                    {heroContent.secondaryCta}
-                  </button>
-                </div>
-              </div>
-            </div>
+          {/* CTA Buttons - BOTH WORKING */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Primary Button */}
+            <button
+              onClick={() => {
+                analytics.clickedCta("primary_cta");
+                scrollToProducts();
+              }}
+              className="px-10 py-4 bg-[#111111] text-white border-2 border-[#111111] hover:bg-white hover:text-[#111111] transition-all duration-300 text-xs tracking-wider uppercase font-bold rounded-lg shadow-lg hover:shadow-xl"
+              type="button"
+            >
+              {heroContent.primaryCta}
+            </button>
 
-            <div className="hidden lg:block lg:col-span-6 xl:col-span-7" />
+            {/* Secondary Button */}
+            <button
+              onClick={() => {
+                analytics.clickedCta("secondary_cta");
+                // Filter to Wigs category
+                setFilters(prev => ({ ...prev, category: "Wigs" }));
+                setSearchParams({ category: "Wigs" });
+                scrollToProducts();
+              }}
+              className="px-10 py-4 bg-transparent text-white border-2 border-white hover:bg-white hover:text-[#111111] transition-all duration-300 text-xs tracking-wider uppercase font-bold rounded-lg shadow-lg hover:shadow-xl"
+              type="button"
+            >
+              {heroContent.secondaryCta}
+            </button>
           </div>
         </div>
       </section>
 
-      <section
-        ref={productsRef}
-        className="container mx-auto px-6 md:px-12 lg:px-24 max-w-[1600px] py-16 md:py-20"
-      >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12 pb-6 border-b border-black/10">
-          <div>
-            <h2 className="font-serif text-3xl md:text-4xl tracking-tight text-black">
-              {titleText}
-            </h2>
-            <p className="text-sm text-black/60 mt-1">
-              Explore premium wigs, hair products, and beauty accessories
-            </p>
-          </div>
+      {/* Products Section */}
+      <section ref={productsRef} className="bg-white py-20 md:py-32">
+        <div className="container mx-auto px-6 md:px-12 lg:px-24 max-w-[1600px]">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+            <div>
+              <p className="text-[10px] tracking-[0.35em] uppercase text-[#999] mb-2">
+                Collection
+              </p>
+              <h2 className="font-serif text-5xl md:text-6xl text-[#111111]">
+                {titleText}
+              </h2>
+            </div>
 
-          <div className="flex flex-wrap gap-3 w-full md:w-auto">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 px-4 py-2 border border-black/20 hover:border-black transition-colors text-sm"
-              type="button"
-            >
-              <SlidersHorizontal size={16} />
-              <span>Filters</span>
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-6 py-3 border border-[#E7E0D8] rounded-lg hover:border-[#111111] hover:bg-[#F8F6F4] transition-all duration-300 text-xs tracking-wider uppercase font-semibold text-[#111111]"
+              >
+                <SlidersHorizontal size={16} />
+                Filters
+              </button>
 
-            <select
-              value={filters.sort}
-              onChange={(e) => handleFilterChange("sort", e.target.value)}
-              className="px-4 py-2 border border-black/20 bg-transparent text-sm focus:border-black focus:ring-0"
-            >
-              <option value="">Sort By</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="name">Name: A to Z</option>
-            </select>
-          </div>
-        </div>
-
-        {showFilters && (
-          <div className="mb-8 p-6 border border-black/10 bg-[#faf8f6] animate-slide-down">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-semibold mb-3 tracking-[0.2em] uppercase text-black">
-                  Category
-                </label>
-                <div className="space-y-2">
-                  {["", ...categoryOptions].map((cat) => (
-                    <label key={cat || "all"} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={filters.category === cat}
-                        onChange={() => handleFilterChange("category", cat)}
-                        className="accent-black"
-                      />
-                      <span className="text-sm">{cat || "All"}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-3 tracking-[0.2em] uppercase text-black">
-                  Search
-                </label>
-                <input
-                  type="text"
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange("search", e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full px-4 py-2 border-b-2 border-black/20 focus:border-black bg-transparent focus:ring-0"
-                />
-              </div>
+              <select
+                value={filters.sort}
+                onChange={(e) => handleFilterChange("sort", e.target.value)}
+                className="px-6 py-3 border border-[#E7E0D8] rounded-lg bg-white text-[#111111] text-xs tracking-wider uppercase font-semibold hover:border-[#111111] transition-all focus:border-[#111111] focus:ring-0"
+              >
+                <option value="">Sort By</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="name">Name: A to Z</option>
+              </select>
             </div>
           </div>
-        )}
 
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block w-12 h-12 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-black/60">Loading products...</p>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="font-serif text-2xl text-black mb-2">No products found</p>
-            <p className="text-black/60">Try adjusting your filters</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {products.map((product) => {
-              const pid = String(normalizeId(product) || "");
-              const defaultImgRaw = pickDefaultImage(product);
-              const hoverImgRaw = pickHoverImage(product);
-              const defaultImg = absolutizeMaybe(defaultImgRaw);
-              const hoverImg = absolutizeMaybe(hoverImgRaw);
-              const canSwap = !!hoverImg && hoverImg !== defaultImg;
-
-              return (
-                <div
-                  key={pid}
-                  className="group bg-white border border-black/10 hover:border-black/25 transition-all duration-300"
-                >
-                  <div className="relative overflow-hidden">
-                    <Link to={`/products/${product.slug}`}>
-                      <div className="relative w-full h-80 bg-black/[0.02]">
-                        {defaultImg ? (
-                          <img
-                            src={defaultImg}
-                            alt={product.name}
-                            className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-                              canSwap ? "opacity-100 group-hover:opacity-0" : "opacity-100"
-                            } group-hover:scale-105`}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 w-full h-full bg-black/[0.03]" />
-                        )}
-
-                        {canSwap ? (
-                          <img
-                            src={hoverImg}
-                            alt={`${product.name} (on model)`}
-                            className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
-                            loading="lazy"
-                          />
-                        ) : null}
-                      </div>
-                    </Link>
-
-                    <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <button
-                        onClick={() => toggleWishlist(pid)}
-                        className="w-10 h-10 bg-white border border-black/15 flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-                        type="button"
-                      >
-                        <Heart size={18} fill={wishlist.includes(pid) ? "currentColor" : "none"} />
-                      </button>
-                      <Link
-                        to={`/products/${product.slug}`}
-                        className="w-10 h-10 bg-white border border-black/15 flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-                      >
-                        <Eye size={18} />
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="mb-3">
-                      <span className="text-xs tracking-[0.2em] uppercase text-black/60">
-                        {product.category}
-                      </span>
-                    </div>
-
-                    <Link to={`/products/${product.slug}`}>
-                      <h3 className="font-serif text-xl text-black mb-2 hover:text-black transition-colors">
-                        {product.name}
-                      </h3>
-                    </Link>
-
-                    <p className="text-sm text-black/60 mb-4 line-clamp-2">
-                      {product.shortDescription}
-                    </p>
-
-                    <button
-                      onClick={() => addToCart(product)}
-                      className="w-full py-3 bg-black text-white border border-black hover:bg-black hover:border-black transition-all duration-300 text-xs tracking-[0.2em] uppercase font-semibold flex items-center justify-center space-x-2"
-                      type="button"
-                    >
-                      <ShoppingCart size={16} />
-                      <span>Add to Cart</span>
-                    </button>
+          {/* Filter Panel - COMPACT */}
+          {showFilters && (
+            <div className="mb-12 p-8 border border-[#E7E0D8] bg-[#F8F6F4] rounded-xl animate-slide-down">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                {/* Category Filter */}
+                <div>
+                  <label className="block text-xs font-semibold mb-4 tracking-[0.2em] uppercase text-[#111111]">
+                    Category
+                  </label>
+                  <div className="space-y-3">
+                    {["", ...categoryOptions].map((cat) => (
+                      <label key={cat || "all"} className="flex items-center space-x-3 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="category"
+                          checked={filters.category === cat}
+                          onChange={() => handleFilterChange("category", cat)}
+                          className="accent-[#111111]"
+                        />
+                        <span className="text-sm text-[#666] group-hover:text-[#111111] transition-colors">
+                          {cat || "All"}
+                        </span>
+                      </label>
+                    ))}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+
+                {/* Collection Filter */}
+                {navData.collections.length > 0 && (
+                  <div>
+                    <label className="block text-xs font-semibold mb-4 tracking-[0.2em] uppercase text-[#111111]">
+                      Collection
+                    </label>
+                    <select
+                      value={filters.collection}
+                      onChange={(e) => handleFilterChange("collection", e.target.value)}
+                      className="w-full px-4 py-2.5 border-b-2 border-[#E7E0D8] bg-transparent text-[#111111] text-sm focus:border-[#111111] focus:ring-0"
+                    >
+                      <option value="">All Collections</option>
+                      {navData.collections.map((col) => (
+                        <option key={col.slug} value={col.slug}>
+                          {col.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Search Filter */}
+                <div>
+                  <label className="block text-xs font-semibold mb-4 tracking-[0.2em] uppercase text-[#111111]">
+                    Search
+                  </label>
+                  <input
+                    type="text"
+                    value={filters.search}
+                    onChange={(e) => handleFilterChange("search", e.target.value)}
+                    placeholder="Find a product..."
+                    className="w-full px-4 py-2.5 border-b-2 border-[#E7E0D8] bg-transparent text-[#111111] text-sm focus:border-[#111111] focus:ring-0 placeholder:text-[#999]"
+                  />
+                </div>
+
+                {/* Clear Filters */}
+                <div className="flex items-end">
+                  <button
+                    onClick={() => {
+                      setFilters({ category: "", collection: "", search: "", sort: "" });
+                      setSearchParams({});
+                    }}
+                    className="w-full px-4 py-2.5 text-sm text-[#999] hover:text-[#111111] transition-colors text-center"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="inline-block w-12 h-12 border-2 border-[#E7E0D8] border-t-[#111111] rounded-full animate-spin"></div>
+              <p className="mt-6 text-[#999]">Loading premium collection...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="font-serif text-3xl text-[#111111] mb-2">No products found</p>
+              <p className="text-[#666] mb-8">Try adjusting your filters or search</p>
+              <button
+                onClick={() => {
+                  setFilters({ category: "", collection: "", search: "", sort: "" });
+                  setSearchParams({});
+                }}
+                className="px-8 py-3 border border-[#E7E0D8] rounded-lg hover:bg-[#F8F6F4] transition-all text-sm font-semibold text-[#111111]"
+              >
+                View All Products
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {products.map((product) => {
+                const pid = String(normalizeId(product) || "");
+                const defaultImgRaw = pickDefaultImage(product);
+                const hoverImgRaw = pickHoverImage(product);
+                const defaultImg = absolutizeMaybe(defaultImgRaw);
+                const hoverImg = absolutizeMaybe(hoverImgRaw);
+                const canSwap = !!hoverImg && hoverImg !== defaultImg;
+                const isWishlisted = wishlist.includes(pid);
+
+                return (
+                  <div
+                    key={pid}
+                    className="group bg-white border border-[#E7E0D8] hover:border-[#111111] hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)] transition-all duration-300 rounded-lg overflow-hidden"
+                  >
+                    {/* Image Container */}
+                    <div className="relative overflow-hidden aspect-square bg-[#F8F6F4]">
+                      <Link to={`/products/${product.slug}`}>
+                        <div className="relative w-full h-full">
+                          {defaultImg ? (
+                            <img
+                              src={defaultImg}
+                              alt={product.name}
+                              className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
+                                canSwap ? "opacity-100 group-hover:opacity-0" : "opacity-100"
+                              } group-hover:scale-105`}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 w-full h-full bg-[#F0EBDE]" />
+                          )}
+
+                          {canSwap ? (
+                            <img
+                              src={hoverImg}
+                              alt={`${product.name} detail`}
+                              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                          ) : null}
+                        </div>
+                      </Link>
+
+                      {/* Badges */}
+                      {product.isFeatured && (
+                        <div className="absolute top-4 left-4">
+                          <span className="px-3 py-1.5 bg-[#111111] text-white text-[10px] tracking-[0.15em] uppercase font-semibold">
+                            Featured
+                          </span>
+                        </div>
+                      )}
+
+                      {product.discountPercentage > 0 && (
+                        <div className="absolute top-4 right-4">
+                          <span className="px-3 py-1.5 bg-red-600 text-white text-[10px] tracking-[0.15em] uppercase font-semibold">
+                            -{Math.round(product.discountPercentage)}%
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute bottom-4 left-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                        <button
+                          onClick={() => toggleWishlist(pid)}
+                          className={`flex-1 py-2.5 border border-white text-white hover:bg-white hover:text-[#111111] transition-all duration-300 text-xs tracking-wider uppercase font-semibold flex items-center justify-center gap-2 rounded ${
+                            isWishlisted ? "bg-white text-[#111111]" : "bg-black/30"
+                          }`}
+                          type="button"
+                          title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                        >
+                          <Heart size={14} fill={isWishlisted ? "currentColor" : "none"} />
+                          {isWishlisted ? "Saved" : "Save"}
+                        </button>
+                        <Link
+                          to={`/products/${product.slug}`}
+                          className="flex-1 py-2.5 bg-white text-[#111111] hover:bg-[#111111] hover:text-white transition-all duration-300 text-xs tracking-wider uppercase font-semibold flex items-center justify-center gap-2 rounded"
+                        >
+                          <Eye size={14} />
+                          View
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-6">
+                      <div className="mb-3">
+                        <span className="text-[10px] tracking-[0.2em] uppercase text-[#999]">
+                          {product.category}
+                        </span>
+                      </div>
+
+                      <Link to={`/products/${product.slug}`}>
+                        <h3 className="font-serif text-lg text-[#111111] mb-2 group-hover:text-[#666] transition-colors line-clamp-2">
+                          {product.name}
+                        </h3>
+                      </Link>
+
+                      <p className="text-xs text-[#999] mb-4 line-clamp-2">
+                        {product.shortDescription}
+                      </p>
+
+                      {/* Price */}
+                      <div className="mb-4">
+                        {product.salePrice ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-base font-semibold text-[#111111]">
+                              KES {product.salePrice.toLocaleString()}
+                            </span>
+                            <span className="text-sm text-[#999] line-through">
+                              KES {product.basePrice.toLocaleString()}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-base font-semibold text-[#111111]">
+                            KES {product.basePrice.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Add to Cart Button */}
+                      <button
+                        onClick={() => addToCart(product)}
+                        className="w-full py-3 bg-[#111111] text-white border border-[#111111] hover:bg-white hover:text-[#111111] transition-all duration-300 text-xs tracking-[0.2em] uppercase font-semibold flex items-center justify-center gap-2 rounded"
+                        type="button"
+                      >
+                        <ShoppingCart size={14} />
+                        <span>Add to Cart</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-16">
+              <button
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="px-6 py-3 border border-[#E7E0D8] text-[#111111] hover:border-[#111111] hover:bg-[#F8F6F4] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold rounded-lg"
+              >
+                Previous
+              </button>
+
+              <div className="text-sm text-[#666]">
+                Page {page} of {totalPages}
+              </div>
+
+              <button
+                onClick={() => setPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                className="px-6 py-3 border border-[#E7E0D8] text-[#111111] hover:border-[#111111] hover:bg-[#F8F6F4] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold rounded-lg"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
       </section>
     </div>
   );
